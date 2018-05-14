@@ -54,25 +54,7 @@ client.on('message', msg => {
   }
 });
  
-client.on('message', message =>{
-  if(message.author == client.user)return;
-  if(!message.guild) return;
-  if(!message.guild.roles.find(r => r.name == "muted")) return;
-  if(!users[message.author.id]) users[message.author.id] = {sp:0};
-  var user = users[message.author.id]
-  users[message.author.id].sp++;
-  setTimeout(()=>{
-  users[message.author.id].sp =0;
-  },3000)
-  if(user.sp >= 3){
-          users[message.author.id].sp  =0
-      message.guild.member(message.author).addRole(message.guild.roles.find(r => r.name == "muted"))
-      message.channel.fetchMessages({limit: 5}).then(messages => message.channel.bulkDelete(messages)).catch(console.error);
-      message.reply(`Stop Spam -_-`);
-       
-return;
-  }
-});
+
  
     client.on('message', message => {
       var prefix = "+";
