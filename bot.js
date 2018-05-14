@@ -2741,68 +2741,48 @@ if (message.content === "sss") {
 	}
 });
 
-
- let Colors = '**أنت لا تمتلك الوان في سيرفرك**'
 client.on('message', message => {
-   if (message.content.startsWith("الوان")) {
-     if(!message.guild.roles.find("name","1")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","2")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","3")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","4")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","5")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","6")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","7")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","8")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","9")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","10")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","11")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","12")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","13")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","14")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","15")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","16")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","17")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","18")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","19")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","20")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","21")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","22")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","23")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","24")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","25")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","26")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","27")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","28")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","29")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","30")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","31")) return message.channel.send(Colors);
-          if(!message.guild.roles.find("name","32")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","34")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","35")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","36")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","37")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","38")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","39")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","40")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","41")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","42")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","43")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","44")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","45")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","46")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","47")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","48")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","49")) return message.channel.send(Colors);
-     if(!message.guild.roles.find("name","50")) return message.channel.send(Colors);
-
+   if (message.content.startsWith("-colors")) {
+     if(!message.guild.roles.find("name","1")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","2")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","3")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","4")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","5")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","6")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","7")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","8")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","9")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","10")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","11")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","12")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","13")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","14")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","15")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","16")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","17")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","18")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","19")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","20")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","21")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","22")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","23")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","24")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","25")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","26")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","27")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","28")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","29")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","30")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","31")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
+     if(!message.guild.roles.find("name","23")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
 
 
 if(!message.channel.guild) return;
-const w = ['./img/colors.png'];
+const w = ['./p2.png'];
 var Canvas = require('canvas')
 var jimp = require('jimp')
      let Image = Canvas.Image,
-            canvas = new Canvas(400, 600),
+            canvas = new Canvas(600, 400), // هنا يمديك تتحكم بكبر الصوره
             ctx = canvas.getContext('2d');
         ctx.patternQuality = 'bilinear';
         ctx.filter = 'bilinear';
@@ -2813,7 +2793,7 @@ var jimp = require('jimp')
             let BG = Canvas.Image;
             let ground = new Image;
             ground.src = Background;
-            ctx.drawImage(ground, 0, 0, 400, 600);
+            ctx.drawImage(ground, 0, 0, 600, 400);
 
 })
  
@@ -2827,7 +2807,7 @@ var jimp = require('jimp')
                         let Avatar = Canvas.Image;
                         let ava = new Avatar;
                         ava.src = buf;
-                        ctx.drawImage(ava, -100 , -100, 70, 70);
+                        ctx.drawImage(ava, -100 , -200, 70, 70);
                                    
 ctx.fillStyle = `${message.guild.roles.find("name","1").hexColor}`;
   ctx.fillRect(52, 68, 30, 30);
@@ -2902,82 +2882,36 @@ ctx.fillStyle = `${message.guild.roles.find("name","24").hexColor}`;
   ctx.fillRect(88, 142, 30, 30);
   
   ctx.fillStyle = `${message.guild.roles.find("name","25").hexColor}`;
-  ctx.fillRect(160, 105, 30, 30);
+  ctx.fillRect(124, 142, 30, 30);
   
     ctx.fillStyle = `${message.guild.roles.find("name","26").hexColor}`;
-  ctx.fillRect(196, 142, 30, 30);
+  ctx.fillRect(160, 142, 30, 30);
   
     ctx.fillStyle = `${message.guild.roles.find("name","27").hexColor}`;
-  ctx.fillRect(232, 142, 30, 30);
+  ctx.fillRect(197, 142, 30, 30);
   
     ctx.fillStyle = `${message.guild.roles.find("name","28").hexColor}`;
-  ctx.fillRect(304, 142, 30, 30);
-  
-    ctx.fillStyle = `${message.guild.roles.find("name","29").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
+  ctx.fillRect(232, 142, 30, 30);
+     ctx.fillStyle = `${message.guild.roles.find("name","29").hexColor}`;
+  ctx.fillRect(268, 142, 30, 30);
   
     ctx.fillStyle = `${message.guild.roles.find("name","30").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
+  ctx.fillRect(304, 142, 30, 30);
     ctx.fillStyle = `${message.guild.roles.find("name","31").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
+  ctx.fillRect(340, 142, 30, 30);
+     ctx.fillStyle = `${message.guild.roles.find("name","32").hexColor}`;
+  ctx.fillRect(376, 142, 30, 30);
   
-    ctx.fillStyle = `${message.guild.roles.find("name","32").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
+    ctx.fillStyle = `${message.guild.roles.find("name","33").hexColor}`;
+  ctx.fillRect(412, 142, 30, 30);
   
-      ctx.fillStyle = `${message.guild.roles.find("name","33").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
+    ctx.fillStyle = `${message.guild.roles.find("name","34").hexColor}`;
+  ctx.fillRect(54, 182, 30, 30);
+     ctx.fillStyle = `${message.guild.roles.find("name","35").hexColor}`;
+  ctx.fillRect(88, 182, 30, 30);
   
-      ctx.fillStyle = `${message.guild.roles.find("name","34").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","35").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","36").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","37").hexColor}`
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","38").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","39").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","40").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","41").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","42").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","43").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","44").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","45").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","46").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","47").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","48").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","49").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
-  
-      ctx.fillStyle = `${message.guild.roles.find("name","50").hexColor}`;
-  ctx.fillRect(124, 142, 30, 30);
+    ctx.fillStyle = `${message.guild.roles.find("name","36").hexColor}`;
+  ctx.fillRect(124, 182, 30, 30);
   
 
  ctx.font = '15px Bold';
@@ -3134,159 +3068,60 @@ ctx.fillText("25", 139.5  , 162 );
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("26", 211.5  , 162 );  
+ctx.fillText("26", 175.5  , 162 );  
 
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("27", 247.5  , 162 );  
+ctx.fillText("27", 211.5  , 162 );  
 
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("28", 170  , 162 );  
+ctx.fillText("28", 247.5  , 162 );  
 
+ ctx.font = '15px Ciaro';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("29", 283.5  , 162 );  
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("29", 319.5  , 162 );  
-
-
+ctx.fillText("30", 319.5  , 162 );  
+ ctx.font = '15px Ciaro';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("31", 355.5  , 162 );  
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("30", 355.5  , 162 );  
-
-
+ctx.fillText("32", 391.5  , 162 );  
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("31", 391.5  , 162 );  
-
+ctx.fillText("33", 427.5  , 162 );  
+ ctx.font = '15px Ciaro';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("34", 67.5  , 202 );  
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("32", 427.5  , 162 );  
-
-//---------------------------------------
-
+ctx.fillText("35", 103.5  , 202 );  
  ctx.font = '15px Bold';
 ctx.fontSize = '15px';
 ctx.fillStyle = "#ffffff";
 ctx.textAlign = "center";
-ctx.fillText("33", 463.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("34", 499.5  , 194 );  
-
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("35", 535.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("36", 571.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("37", 607.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("38", 643.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("39", 679.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("40", 715.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("41", 761.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("42", 787.5  , 194 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("43", 823.5  , 194 );  
-
-//---------------------------------------
-
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("44", 859.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("45", 895.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("46", 931.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("47", 967.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("48", 1003.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("49", 1039.5  , 226 );  
-
- ctx.font = '15px Bold';
-ctx.fontSize = '15px';
-ctx.fillStyle = "#ffffff";
-ctx.textAlign = "center";
-ctx.fillText("50", 1075.5  , 226 );  
+ctx.fillText("36", 139.5  , 202 );  
 
 message.channel.sendFile(canvas.toBuffer())
 
@@ -3297,7 +3132,6 @@ message.channel.sendFile(canvas.toBuffer())
 }
 
 })
-
 var prefix = '!';
 
 client.on('message', message => {
