@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "canvas": "1.6.10",
+    "jimp": "0.2.28",
     "dateformat": "3.0.3",
     "discord.js": "11.1.0",
     "ffmpeg-binaries": "3.2.2-3",
