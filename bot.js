@@ -3,7 +3,6 @@ const request = require('request');
 const getYoutubeID = require('get-youtube-id');
 const fetchVideoInfo = require('youtube-info');
 const fs = require('fs');
-const config = require("./config.json")
 const moment = require('moment');
 const Discord = require('discord.js');
 const { Client, Util } = require('discord.js');
