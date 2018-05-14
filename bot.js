@@ -1,216 +1,16 @@
+const Discord = require('discord.js');
+const client = new Discord.Client();
 const dateFormat = require('dateformat');
 const request = require('request');
 const getYoutubeID = require('get-youtube-id');
 const fetchVideoInfo = require('youtube-info');
 const fs = require('fs');
 const moment = require('moment');
-const Discord = require('discord.js');
-const { Client, Util } = require('discord.js');
-const client = new Discord.Client();
-const { TOKEN ,PREFIX, GOOGLE_API_KEY } = require('./config1');
-const YouTube = require('simple-youtube-api');
-const ytdl = require('ytdl-core');
 
 
-const youtube = new YouTube(GOOGLE_API_KEY);
 
-const queue = new Map();
 
-client.on('ready', () => {
-    console.log('I am ready!');
-});
 
-client.on('warn', console.warn);
-
-client.on('error', console.error);
-
-client.on('ready', () => console.log('Yo this ready!'));
-
-// client.on('disconnect', () => console.log('I just disconnected, making sure you know, I will reconnect now...'));
-
-// client.on('reconnecting', () => console.log('I am reconnecting now!'));
-
-client.on('message', async msg => { // eslint-disable-line
-	if (msg.author.bot) return undefined;
-	if (!msg.content.startsWith(PREFIX)) return undefined;
-
-	const args = msg.content.split(' ');
-	const searchString = args.slice(1).join(' ');
-	const url = args[1] ? args[1].replace(/<(.+)>/g, '$1') : '';
-	const serverQueue = queue.get(msg.guild.id);
-
-	let command = msg.content.toLowerCase().split(" ")[0];
-	command = command.slice(PREFIX.length)
-
-	if (command === `play`) {
-		const voiceChannel = msg.member.voiceChannel;
-		if (!voiceChannel) return msg.channel.send('أنا آسف ولكن عليك أن تكون في قناة صوتية لتشغيل الموسيقى!');
-		const permissions = voiceChannel.permissionsFor(msg.client.user);
-		if (!permissions.has('CONNECT')) {
-			return msg.channel.send('لا أستطيع أن أتكلم في هذه القناة الصوتية، تأكد من أن لدي الصلاحيات الازمة !');
-		}
-		if (!permissions.has('SPEAK')) {
-			return msg.channel.send('لا أستطيع أن أتكلم في هذه القناة الصوتية، تأكد من أن لدي الصلاحيات الازمة !');
-		}
-		if (!permissions.has('EMBED_LINKS')) {
-			return msg.channel.sendMessage("**لا يوجد لدي صلاحيات `EMBED LINKS`**")
-		}
-
-		if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
-			const playlist = await youtube.getPlaylist(url);
-			const videos = await playlist.getVideos();
-			for (const video of Object.values(videos)) {
-				const video2 = await youtube.getVideoByID(video.id); // eslint-disable-line no-await-in-loop
-				await handleVideo(video2, msg, voiceChannel, true); // eslint-disable-line no-await-in-loop
-			}
-			return msg.channel.send(` **${playlist.title}** تم اضافة القائمه!`);
-		} else {
-			try {
-				var video = await youtube.getVideo(url);
-			} catch (error) {
-				try {
-					var videos = await youtube.searchVideos(searchString, 5);
-					let index = 0;
-					const embed1 = new Discord.RichEmbed()
-			        .setDescription(`**اختار رقم المقطع** :
-${videos.map(video2 => `[**${++index} **] \`${video2.title}\``).join('\n')}`)
-					.setFooter("")
-					msg.channel.sendEmbed(embed1).then(message =>{message.delete(20000)})
-					
-					// eslint-disable-next-line max-depth
-					try {
-						var response = await msg.channel.awaitMessages(msg2 => msg2.content > 0 && msg2.content < 11, {
-							maxMatches: 1,
-							time: 10000,
-							errors: ['time']
-						});
-					} catch (err) {
-						console.error(err);
-						return msg.channel.send('لم يتم تحديد العدد لتشغيل الاغنيه.');
-					}
-					const videoIndex = parseInt(response.first().content);
-					var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
-				} catch (err) {
-					console.error(err);
-					return msg.channel.send(':X: لم أستطع الحصول على أية نتائج بحث.');
-				}
-			}
-			return handleVideo(video, msg, voiceChannel);
-		}
-	} else if (command === `skip`) {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing that I could skip for you.');
-		serverQueue.connection.dispatcher.end('Skip command has been used!');
-		return undefined;
-	} else if (command === `stop`) {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
-		serverQueue.songs = [];
-		serverQueue.connection.dispatcher.end('Stop command has been used!');
-		return undefined;
-	} else if (command === `vol`) {
-		if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
-		if (!serverQueue) return msg.channel.send('There is nothing playing.');
-		if (!args[1]) return msg.channel.send(`:loud_sound: Current volume is **${serverQueue.volume}**`);
-		serverQueue.volume = args[1];
-		serverQueue.connection.dispatcher.setVolumeLogarithmic(args[1] / 5);
-		return msg.channel.send(`:speaker: تم تغير الصوت الي **${args[1]}**`);
-	} else if (command === `np`) {
-		if (!serverQueue) return msg.channel.send('لا يوجد شيء حالي ف العمل.');
-		const embedNP = new Discord.RichEmbed()
-	.setDescription(`:notes: الان يتم تشغيل: **${serverQueue.songs[0].title}**`)
-		return msg.channel.sendEmbed(embedNP);
-	} else if (command === `queue`) {
-		
-		if (!serverQueue) return msg.channel.send('There is nothing playing.');
-		let index = 0;
-		const embedqu = new Discord.RichEmbed()
-	.setDescription(`**Songs Queue**
-${serverQueue.songs.map(song => `**${++index} -** ${song.title}`).join('\n')}
-**الان يتم تشغيل** ${serverQueue.songs[0].title}`)
-		return msg.channel.sendEmbed(embedqu);
-	} else if (command === `pause`) {
-		if (serverQueue && serverQueue.playing) {
-			serverQueue.playing = false;
-			serverQueue.connection.dispatcher.pause();
-			return msg.channel.send('تم إيقاف الموسيقى مؤقتا!');
-		}
-		return msg.channel.send('There is nothing playing.');
-	} else if (command === "resume") {
-		if (serverQueue && !serverQueue.playing) {
-			serverQueue.playing = true;
-			serverQueue.connection.dispatcher.resume();
-			return msg.channel.send('استأنفت الموسيقى بالنسبة لك !');
-		}
-		return msg.channel.send('لا يوجد شيء حالي في العمل.');
-	}
-
-	return undefined;
-});
-
-async function handleVideo(video, msg, voiceChannel, playlist = false) {
-	const serverQueue = queue.get(msg.guild.id);
-	console.log(video);
-	
-//	console.log('yao: ' + Util.escapeMarkdown(video.thumbnailUrl));
-	const song = {
-		id: video.id,
-		title: Util.escapeMarkdown(video.title),
-		url: `https://www.youtube.com/watch?v=${video.id}`
-	};
-	if (!serverQueue) {
-		const queueConstruct = {
-			textChannel: msg.channel,
-			voiceChannel: voiceChannel,
-			connection: null,
-			songs: [],
-			volume: 5,
-			playing: true
-		};
-		queue.set(msg.guild.id, queueConstruct);
-
-		queueConstruct.songs.push(song);
-
-		try {
-			var connection = await voiceChannel.join();
-			queueConstruct.connection = connection;
-			play(msg.guild, queueConstruct.songs[0]);
-		} catch (error) {
-			console.error(`I could not join the voice channel: ${error}`);
-			queue.delete(msg.guild.id);
-			return msg.channel.send(`I could not join the voice channel: ${error}`);
-		}
-	} else {
-		serverQueue.songs.push(song);
-		console.log(serverQueue.songs);
-		if (playlist) return undefined;
-		else return msg.channel.send(` **${song.title}** تم اضافه الاغنية الي القائمة!`);
-	}
-	return undefined;
-}
-
-function play(guild, song) {
-	const serverQueue = queue.get(guild.id);
-
-	if (!song) {
-		serverQueue.voiceChannel.leave();
-		queue.delete(guild.id);
-		return;
-	}
-	console.log(serverQueue.songs);
-
-	const dispatcher = serverQueue.connection.playStream(ytdl(song.url))
-		.on('end', reason => {
-			if (reason === 'Stream is not generating quickly enough.') console.log('Song ended.');
-			else console.log(reason);
-			serverQueue.songs.shift();
-			play(guild, serverQueue.songs[0]);
-		})
-		.on('error', error => console.error(error));
-	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-
-	serverQueue.textChannel.send(`بدء تشغيل: **${song.title}**`);
-}
 
 
 
@@ -2711,18 +2511,572 @@ if (message.content === x10) {
   message.channel.sendEmbed(embed);
 	message.react("??")
 	}
-if (message.content === "الوان") {
+if (message.content === "@$") {
 	const embed = new Discord.RichEmbed()
 	.setColor('RANDOM')
-	.setFooter('R3B TEAM.')
+	.setFooter('')
 	.setDescription(`Type: لون <number>`)
-	.setImage('https://media.discordapp.net/attachments/445346189769179136/445528086386180096/colors.png')
+	.setImage('')
 	message.channel.sendEmbed(embed);
 	message.react("??")
 	}
 });
 
+let Colors = '**أنت لا تمتلك الوان في سيرفرك**'
+client.on('message', message => {
+   if (message.content.startsWith("!colors")) {
+     if(!message.guild.roles.find("name","1")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","2")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","3")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","4")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","5")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","6")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","7")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","8")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","9")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","10")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","11")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","12")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","13")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","14")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","15")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","16")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","17")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","18")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","19")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","20")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","21")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","22")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","23")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","24")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","25")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","26")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","27")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","28")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","29")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","30")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","31")) return message.channel.send(Colors);
+          if(!message.guild.roles.find("name","32")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","34")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","35")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","36")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","37")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","38")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","39")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","40")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","41")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","42")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","43")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","44")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","45")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","46")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","47")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","48")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","49")) return message.channel.send(Colors);
+     if(!message.guild.roles.find("name","50")) return message.channel.send(Colors);
 
+
+
+if(!message.channel.guild) return;
+const w = ['./img/colors.png'];
+var Canvas = require('canvas')
+var jimp = require('jimp')
+     let Image = Canvas.Image,
+            canvas = new Canvas(400, 600),
+            ctx = canvas.getContext('2d');
+        ctx.patternQuality = 'bilinear';
+        ctx.filter = 'bilinear';
+        ctx.antialias = 'subpixel';
+  
+        fs.readFile(`${w[Math.floor(Math.random() * w.length)]}`, function (err, Background) {
+            if (err) return console.log(err);
+            let BG = Canvas.Image;
+            let ground = new Image;
+            ground.src = Background;
+            ctx.drawImage(ground, 0, 0, 400, 600);
+
+})
+ 
+
+                let url = message.author.displayAvatarURL.endsWith(".webp") ? message.author.displayAvatarURL.slice(20, 20) + ".png" : message.author.displayAvatarURL;
+                jimp.read(url, (err, ava) => {
+                    if (err) return console.log(err);
+                    ava.getBuffer(jimp.MIME_PNG, (err, buf) => {
+                        if (err) return console.log(err);
+
+                        let Avatar = Canvas.Image;
+                        let ava = new Avatar;
+                        ava.src = buf;
+                        ctx.drawImage(ava, -100 , -100, 70, 70);
+                                   
+ctx.fillStyle = `${message.guild.roles.find("name","1").hexColor}`;
+  ctx.fillRect(52, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","2").hexColor}`;
+  ctx.fillRect(88, 68, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","3").hexColor}`;
+  ctx.fillRect(124, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","4").hexColor}`;
+  ctx.fillRect(160, 68, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","5").hexColor}`;
+  ctx.fillRect(196, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","6").hexColor}`;
+  ctx.fillRect(232, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","7").hexColor}`;
+  ctx.fillRect(268, 68, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","8").hexColor}`;
+  ctx.fillRect(304, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","9").hexColor}`;
+  ctx.fillRect(340, 68, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","10").hexColor}`;
+  ctx.fillRect(376, 68, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","11").hexColor}`;
+  ctx.fillRect(412, 68, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","12").hexColor}`;
+  ctx.fillRect(52, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","13").hexColor}`;
+  ctx.fillRect(88, 105, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","14").hexColor}`;
+  ctx.fillRect(124, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","15").hexColor}`;
+  ctx.fillRect(160, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","16").hexColor}`;
+  ctx.fillRect(196, 105, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","17").hexColor}`;
+  ctx.fillRect(232, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","18").hexColor}`;
+  ctx.fillRect(268, 105, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","19").hexColor}`;
+  ctx.fillRect(304, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","20").hexColor}`;
+  ctx.fillRect(340, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","21").hexColor}`;
+  ctx.fillRect(376, 105, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","22").hexColor}`;
+  ctx.fillRect(412, 105, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","23").hexColor}`;
+  ctx.fillRect(52, 142, 30, 30);
+  
+ctx.fillStyle = `${message.guild.roles.find("name","24").hexColor}`;
+  ctx.fillRect(88, 142, 30, 30);
+  
+  ctx.fillStyle = `${message.guild.roles.find("name","25").hexColor}`;
+  ctx.fillRect(160, 105, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","26").hexColor}`;
+  ctx.fillRect(196, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","27").hexColor}`;
+  ctx.fillRect(232, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","28").hexColor}`;
+  ctx.fillRect(304, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","29").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","30").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","31").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+    ctx.fillStyle = `${message.guild.roles.find("name","32").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","33").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","34").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","35").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","36").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","37").hexColor}`
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","38").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","39").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","40").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","41").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","42").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","43").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","44").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","45").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","46").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","47").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","48").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","49").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+      ctx.fillStyle = `${message.guild.roles.find("name","50").hexColor}`;
+  ctx.fillRect(124, 142, 30, 30);
+  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("1", 67.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("2", 103.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("3", 139.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("4", 175.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("5", 211.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("6", 247.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("7", 283.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("8", 319.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("9", 355.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("10", 391.5  , 88 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("11", 427.5  , 88 );
+  
+   ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("12", 67.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("13", 103.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("14", 139.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("15", 175.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("16", 211.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("17", 247.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("18", 283.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("19", 319.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("20", 355.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("21", 391.5  , 125 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("22", 427.5  , 125 );
+  
+   ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("23", 67.5  , 162 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("24", 103.5  , 162 );
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("25", 139.5  , 162 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("26", 211.5  , 162 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("27", 247.5  , 162 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("28", 170  , 162 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("29", 319.5  , 162 );  
+
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("30", 355.5  , 162 );  
+
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("31", 391.5  , 162 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("32", 427.5  , 162 );  
+
+//---------------------------------------
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("33", 463.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("34", 499.5  , 194 );  
+
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("35", 535.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("36", 571.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("37", 607.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("38", 643.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("39", 679.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("40", 715.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("41", 761.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("42", 787.5  , 194 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("43", 823.5  , 194 );  
+
+//---------------------------------------
+
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("44", 859.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("45", 895.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("46", 931.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("47", 967.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("48", 1003.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("49", 1039.5  , 226 );  
+
+ ctx.font = '15px Bold';
+ctx.fontSize = '15px';
+ctx.fillStyle = "#ffffff";
+ctx.textAlign = "center";
+ctx.fillText("50", 1075.5  , 226 );  
+
+message.channel.sendFile(canvas.toBuffer())
+
+            
+        })
+    })
+
+}
+
+})
 
 
 client.login(process.env.BOT_TOKEN);
