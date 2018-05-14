@@ -2742,7 +2742,7 @@ if (message.content === "sss") {
 });
 
 client.on('message', message => {
-   if (message.content.startsWith("-colors")) {
+   if (message.content.startsWith("الوان")) {
      if(!message.guild.roles.find("name","1")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
      if(!message.guild.roles.find("name","2")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
      if(!message.guild.roles.find("name","3")) return message.reply("You Don't Have Any Colors Or Its Incomplete ! Try To Create Colors By `-ccolors` :art: ");
