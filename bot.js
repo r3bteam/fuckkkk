@@ -1,4 +1,3 @@
-const client = new Discord.Client();
 const dateFormat = require('dateformat');
 const request = require('request');
 const getYoutubeID = require('get-youtube-id');
