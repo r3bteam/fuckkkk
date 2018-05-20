@@ -14,9 +14,9 @@ const moment = require('moment');
 
 var Eris = require("eris");
 var ID = "447768244498071572";
-var client = new Eris(process.env.BOT_TOKEN);
-client.connect(process.env.BOT_TOKEN)
-client.on("ready", ready => {
+var bot = new Eris(process.env.BOT_TOKEN);
+bot.connect(process.env.BOT_TOKEN)
+bot.on("ready", ready => {
 setInterval(function(){
  
             var currentTime = new Date(),
@@ -41,7 +41,7 @@ setInterval(function(){
             if (hours == 0) {
                 hours = 12;
             }
-client.editChannel("447768244498071572", {name : "- Users  (" + client.users.size + ")"});
+bot.editChannel("447768244498071572", {name : "- Users  (" + bot.users.size + ")"});
 }, 3000);
  
 }); 
