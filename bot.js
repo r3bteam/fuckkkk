@@ -11,6 +11,42 @@ const fetchVideoInfo = require('youtube-info');
 const fs = require('fs');
 const moment = require('moment');
  
+
+var Eris = require("eris");
+var ID = "447768244498071572";
+var client = new Eris(process.env.BOT_TOKEN);
+client.connect(process.env.BOT_TOKEN)
+client.on("ready", ready => {
+setInterval(function(){
+ 
+            var currentTime = new Date(),
+            hours = currentTime.getHours() + 2 ,
+            minutes = currentTime.getMinutes(),
+            seconds = currentTime.getSeconds(),
+            years = currentTime.getFullYear(),
+            month = currentTime.getMonth() + 1,
+            day = currentTime.getDate(),
+            week = currentTime.getDay();
+           
+             
+ 
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            }
+            var suffix = "AM";
+            if (hours >= 12) {
+                suffix = "PM";
+                hours = hours - 12;
+            }
+            if (hours == 0) {
+                hours = 12;
+            }
+client.editChannel("447768244498071572", {name : "- Users  (" + client.users.size + ")"});
+}, 3000);
+ 
+}); 
+
+
  
 client.on('message',message =>{
   var prefix = "+";
